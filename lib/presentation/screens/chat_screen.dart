@@ -8,6 +8,7 @@ import '../widgets/chat_message_widget.dart';
 import '../widgets/chat_input.dart';
 import '../widgets/typing_indicator.dart';
 import '../../core/constants/app_constants.dart';
+import '../../data/datasources/ai_agent_service.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String? existingTripId;
@@ -142,33 +143,48 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
 
     try {
-      // Generate itinerary using streaming
-      final streamNotifier = ref.read(itineraryStreamNotifierProvider.notifier);
+      // Use enhanced chat with function calling
+      final aiService = ref.read(aiAgentServiceProvider);
+      final chatMessages = ref.read(chatNotifierProvider);
       String fullResponse = '';
       
-      await for (final chunk in streamNotifier.generateItineraryStream(
-        message.trim(),
-        existingTrip: _currentTrip,
-      )) {
-        fullResponse += chunk;
-        _scrollToBottom();
-      }
-
-      // Add assistant message
+      // Create streaming assistant message
       final assistantMessage = ChatMessage(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        content: fullResponse,
+        content: '',
         type: ChatMessageType.assistant,
         timestamp: DateTime.now(),
+        isStreaming: true,
       );
-
+      
       ref.read(chatNotifierProvider.notifier).addMessage(assistantMessage);
       
-      // Generate the actual trip
-      await ref.read(tripNotifierProvider.notifier).generateItinerary(
-        message.trim(),
-        existingTrip: _currentTrip,
+      await for (final chunk in aiService.chatWithFunctions(chatMessages)) {
+        fullResponse += chunk;
+        
+        // Update the streaming message
+        final updatedMessage = ChatMessage(
+          id: assistantMessage.id,
+          content: fullResponse,
+          type: ChatMessageType.assistant,
+          timestamp: assistantMessage.timestamp,
+          isStreaming: true,
+        );
+        
+        ref.read(chatNotifierProvider.notifier).updateLastMessage(updatedMessage);
+        _scrollToBottom();
+      }
+      
+      // Mark message as complete
+      final finalMessage = ChatMessage(
+        id: assistantMessage.id,
+        content: fullResponse,
+        type: ChatMessageType.assistant,
+        timestamp: assistantMessage.timestamp,
+        isStreaming: false,
       );
+      
+      ref.read(chatNotifierProvider.notifier).updateLastMessage(finalMessage);
 
     } catch (error) {
       // Add error message
