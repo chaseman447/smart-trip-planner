@@ -1,17 +1,79 @@
-# smart_tri_planner
+# Smart Trip Planner 🌍
 
-A new Flutter project.
+An AI-powered Flutter application that helps users plan their perfect trips using OpenAI's GPT-4 and real-time web search capabilities.
 
-## Getting Started
+## Features ✨
 
-This project is a starting point for a Flutter application.
+- 🤖 **AI-Powered Trip Planning**: Natural language trip planning with OpenAI GPT-4
+- 🔍 **Real-time Web Search**: Get up-to-date information about destinations
+- 💬 **Interactive Chat Interface**: Streaming responses for real-time conversation
+- 💾 **Offline Storage**: Save and manage trips locally with Isar database
+- 🎨 **Modern UI**: Clean, responsive design with rich itinerary displays
+- 🧪 **Comprehensive Testing**: Unit, widget, and integration tests
 
-A few resources to get you started if this is your first Flutter project:
+## Getting Started 🚀
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Prerequisites
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# smart-trip-planner
+- Flutter SDK (>=3.0.0)
+- Dart SDK (>=3.0.0)
+- OpenAI API Key
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/smart-trip-planner.git
+   cd smart-trip-planner
+   ```
+
+2. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and add your OpenAI API key:
+   ```
+   OPENAI_API_KEY=your-actual-openai-api-key-here
+   ```
+
+4. **Run the app**
+   ```bash
+   flutter run --dart-define-from-file=.env
+   ```
+
+### Testing 🧪
+
+Run all tests:
+```bash
+flutter test
+```
+
+Run integration tests:
+```bash
+flutter test integration_test/
+```
+
+## Architecture 🏗️
+
+This project follows Clean Architecture principles:
+
+- **Presentation Layer**: UI components, screens, and state management
+- **Domain Layer**: Business logic, entities, and use cases
+- **Data Layer**: Data sources, repositories, and models
+
+## Contributing 🤝
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License 📄
+
+This project is licensed under the MIT License - see the LICENSE file for details.
