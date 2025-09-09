@@ -19,6 +19,8 @@ final tripsListProvider = AutoDisposeFutureProvider<List<Trip>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef TripsListRef = AutoDisposeFutureProviderRef<List<Trip>>;
 String _$tripByIdHash() => r'7bdf7ff2814d28a49780e1d441653c8211c51a56';
 
@@ -155,6 +157,8 @@ class TripByIdProvider extends AutoDisposeFutureProvider<Trip?> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin TripByIdRef on AutoDisposeFutureProviderRef<Trip?> {
   /// The parameter `tripId` of this provider.
   String get tripId;
@@ -232,4 +236,4 @@ final uiStateNotifierProvider =
 
 typedef _$UiStateNotifier = AutoDisposeNotifier<UiState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

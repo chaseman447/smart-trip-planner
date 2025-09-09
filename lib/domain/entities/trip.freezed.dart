@@ -29,8 +29,12 @@ mixin _$Trip {
   DateTime? get updatedAt => throw _privateConstructorUsedError;
   int get totalTokensUsed => throw _privateConstructorUsedError;
 
+  /// Serializes this Trip to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of Trip
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $TripCopyWith<Trip> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -60,6 +64,8 @@ class _$TripCopyWithImpl<$Res, $Val extends Trip>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Trip
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -134,6 +140,8 @@ class __$$TripImplCopyWithImpl<$Res>
   __$$TripImplCopyWithImpl(_$TripImpl _value, $Res Function(_$TripImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Trip
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -248,7 +256,7 @@ class _$TripImpl implements _Trip {
                 other.totalTokensUsed == totalTokensUsed));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -261,7 +269,9 @@ class _$TripImpl implements _Trip {
       updatedAt,
       totalTokensUsed);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of Trip
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$TripImplCopyWith<_$TripImpl> get copyWith =>
@@ -304,8 +314,11 @@ abstract class _Trip implements Trip {
   DateTime? get updatedAt;
   @override
   int get totalTokensUsed;
+
+  /// Create a copy of Trip
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TripImplCopyWith<_$TripImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -320,8 +333,12 @@ mixin _$DayItinerary {
   String get summary => throw _privateConstructorUsedError;
   List<ItineraryItem> get items => throw _privateConstructorUsedError;
 
+  /// Serializes this DayItinerary to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of DayItinerary
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $DayItineraryCopyWith<DayItinerary> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -345,6 +362,8 @@ class _$DayItineraryCopyWithImpl<$Res, $Val extends DayItinerary>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of DayItinerary
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -388,6 +407,8 @@ class __$$DayItineraryImplCopyWithImpl<$Res>
       _$DayItineraryImpl _value, $Res Function(_$DayItineraryImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of DayItinerary
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -451,12 +472,14 @@ class _$DayItineraryImpl implements _DayItinerary {
             const DeepCollectionEquality().equals(other._items, _items));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, date, summary, const DeepCollectionEquality().hash(_items));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of DayItinerary
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$DayItineraryImplCopyWith<_$DayItineraryImpl> get copyWith =>
@@ -485,8 +508,11 @@ abstract class _DayItinerary implements DayItinerary {
   String get summary;
   @override
   List<ItineraryItem> get items;
+
+  /// Create a copy of DayItinerary
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DayItineraryImplCopyWith<_$DayItineraryImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -502,10 +528,18 @@ mixin _$ItineraryItem {
   String get location => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   String? get mapUrl => throw _privateConstructorUsedError;
+  String? get cost => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
+  double? get latitude => throw _privateConstructorUsedError;
+  double? get longitude => throw _privateConstructorUsedError;
   bool get isCompleted => throw _privateConstructorUsedError;
 
+  /// Serializes this ItineraryItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ItineraryItemCopyWith<ItineraryItem> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -522,6 +556,10 @@ abstract class $ItineraryItemCopyWith<$Res> {
       String location,
       String? description,
       String? mapUrl,
+      String? cost,
+      String? notes,
+      double? latitude,
+      double? longitude,
       bool isCompleted});
 }
 
@@ -535,6 +573,8 @@ class _$ItineraryItemCopyWithImpl<$Res, $Val extends ItineraryItem>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -543,6 +583,10 @@ class _$ItineraryItemCopyWithImpl<$Res, $Val extends ItineraryItem>
     Object? location = null,
     Object? description = freezed,
     Object? mapUrl = freezed,
+    Object? cost = freezed,
+    Object? notes = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? isCompleted = null,
   }) {
     return _then(_value.copyWith(
@@ -566,6 +610,22 @@ class _$ItineraryItemCopyWithImpl<$Res, $Val extends ItineraryItem>
           ? _value.mapUrl
           : mapUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      cost: freezed == cost
+          ? _value.cost
+          : cost // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       isCompleted: null == isCompleted
           ? _value.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
@@ -588,6 +648,10 @@ abstract class _$$ItineraryItemImplCopyWith<$Res>
       String location,
       String? description,
       String? mapUrl,
+      String? cost,
+      String? notes,
+      double? latitude,
+      double? longitude,
       bool isCompleted});
 }
 
@@ -599,6 +663,8 @@ class __$$ItineraryItemImplCopyWithImpl<$Res>
       _$ItineraryItemImpl _value, $Res Function(_$ItineraryItemImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -607,6 +673,10 @@ class __$$ItineraryItemImplCopyWithImpl<$Res>
     Object? location = null,
     Object? description = freezed,
     Object? mapUrl = freezed,
+    Object? cost = freezed,
+    Object? notes = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? isCompleted = null,
   }) {
     return _then(_$ItineraryItemImpl(
@@ -630,6 +700,22 @@ class __$$ItineraryItemImplCopyWithImpl<$Res>
           ? _value.mapUrl
           : mapUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      cost: freezed == cost
+          ? _value.cost
+          : cost // ignore: cast_nullable_to_non_nullable
+              as String?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       isCompleted: null == isCompleted
           ? _value.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
@@ -647,6 +733,10 @@ class _$ItineraryItemImpl implements _ItineraryItem {
       required this.location,
       this.description,
       this.mapUrl,
+      this.cost,
+      this.notes,
+      this.latitude,
+      this.longitude,
       this.isCompleted = false});
 
   factory _$ItineraryItemImpl.fromJson(Map<String, dynamic> json) =>
@@ -663,12 +753,20 @@ class _$ItineraryItemImpl implements _ItineraryItem {
   @override
   final String? mapUrl;
   @override
+  final String? cost;
+  @override
+  final String? notes;
+  @override
+  final double? latitude;
+  @override
+  final double? longitude;
+  @override
   @JsonKey()
   final bool isCompleted;
 
   @override
   String toString() {
-    return 'ItineraryItem(time: $time, activity: $activity, location: $location, description: $description, mapUrl: $mapUrl, isCompleted: $isCompleted)';
+    return 'ItineraryItem(time: $time, activity: $activity, location: $location, description: $description, mapUrl: $mapUrl, cost: $cost, notes: $notes, latitude: $latitude, longitude: $longitude, isCompleted: $isCompleted)';
   }
 
   @override
@@ -684,16 +782,24 @@ class _$ItineraryItemImpl implements _ItineraryItem {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.mapUrl, mapUrl) || other.mapUrl == mapUrl) &&
+            (identical(other.cost, cost) || other.cost == cost) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             (identical(other.isCompleted, isCompleted) ||
                 other.isCompleted == isCompleted));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, time, activity, location, description, mapUrl, isCompleted);
+  int get hashCode => Object.hash(runtimeType, time, activity, location,
+      description, mapUrl, cost, notes, latitude, longitude, isCompleted);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ItineraryItemImplCopyWith<_$ItineraryItemImpl> get copyWith =>
@@ -714,6 +820,10 @@ abstract class _ItineraryItem implements ItineraryItem {
       required final String location,
       final String? description,
       final String? mapUrl,
+      final String? cost,
+      final String? notes,
+      final double? latitude,
+      final double? longitude,
       final bool isCompleted}) = _$ItineraryItemImpl;
 
   factory _ItineraryItem.fromJson(Map<String, dynamic> json) =
@@ -730,9 +840,20 @@ abstract class _ItineraryItem implements ItineraryItem {
   @override
   String? get mapUrl;
   @override
-  bool get isCompleted;
+  String? get cost;
   @override
-  @JsonKey(ignore: true)
+  String? get notes;
+  @override
+  double? get latitude;
+  @override
+  double? get longitude;
+  @override
+  bool get isCompleted;
+
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ItineraryItemImplCopyWith<_$ItineraryItemImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

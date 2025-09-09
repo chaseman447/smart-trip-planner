@@ -66,6 +66,20 @@ dependencies:
   intl: ^0.19.0
   logger: ^2.0.2+1
 
+  # Voice & Speech
+  # speech_to_text: ^6.3.0  # Temporarily disabled due to Kotlin compilation issues
+  flutter_tts: ^3.8.5
+  permission_handler: ^11.1.0
+
+  # Weather & Currency APIs
+  http: ^1.1.2
+
+  # Vector Store & RAG
+  vector_math: ^2.1.4
+
+  # Pathfinding & Algorithms
+  collection: ^1.18.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

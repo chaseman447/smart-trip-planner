@@ -56,6 +56,10 @@ _$ItineraryItemImpl _$$ItineraryItemImplFromJson(Map<String, dynamic> json) =>
       location: json['location'] as String,
       description: json['description'] as String?,
       mapUrl: json['mapUrl'] as String?,
+      cost: json['cost'] as String?,
+      notes: json['notes'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       isCompleted: json['isCompleted'] as bool? ?? false,
     );
 
@@ -66,5 +70,9 @@ Map<String, dynamic> _$$ItineraryItemImplToJson(_$ItineraryItemImpl instance) =>
       'location': instance.location,
       'description': instance.description,
       'mapUrl': instance.mapUrl,
+      'cost': instance.cost,
+      'notes': instance.notes,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
       'isCompleted': instance.isCompleted,
     };

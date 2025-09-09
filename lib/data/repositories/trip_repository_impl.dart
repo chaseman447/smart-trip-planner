@@ -1,21 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/trip.dart';
+import '../../domain/entities/chat_message.dart';
 import '../../domain/repositories/trip_repository.dart';
 import '../../core/errors/failures.dart';
 import '../datasources/local_database.dart';
 import '../datasources/ai_agent_service.dart';
+import '../../core/services/enhanced_ai_agent_service.dart';
 import '../models/trip_model.dart';
 
 class TripRepositoryImpl implements TripRepository {
   final LocalDatabase _localDatabase;
-  final AIAgentService _aiAgentService;
+  final EnhancedAIAgentService _enhancedAiAgentService;
 
-  TripRepositoryImpl(this._localDatabase, this._aiAgentService);
+  TripRepositoryImpl(this._localDatabase, this._enhancedAiAgentService);
 
   @override
   Future<Trip> generateItinerary(String userPrompt, {Trip? existingTrip}) async {
     try {
-      final trip = await _aiAgentService.generateItinerary(userPrompt, existingTrip: existingTrip);
+      final trip = await _enhancedAiAgentService.generateEnhancedItinerary(userPrompt, existingTrip: existingTrip);
       return trip;
     } catch (e) {
       if (e is Failure) {
@@ -28,7 +30,16 @@ class TripRepositoryImpl implements TripRepository {
   @override
   Stream<String> generateItineraryStream(String userPrompt, {Trip? existingTrip}) {
     try {
-      return _aiAgentService.generateItineraryStream(userPrompt, existingTrip: existingTrip);
+      // Convert user prompt to chat messages for the enhanced service
+      final messages = [
+        ChatMessage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          content: userPrompt,
+          type: ChatMessageType.user,
+          timestamp: DateTime.now(),
+        )
+      ];
+      return _enhancedAiAgentService.chatWithTools(messages);
     } catch (e) {
       if (e is Failure) {
         rethrow;
@@ -91,7 +102,21 @@ class TripRepositoryImpl implements TripRepository {
   @override
   Future<String> searchWeb(String query) async {
     try {
-      return await _aiAgentService.searchWeb(query);
+      // Enhanced AI agent service handles web search internally
+      final messages = [
+        ChatMessage(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          content: query,
+          type: ChatMessageType.user,
+          timestamp: DateTime.now(),
+        )
+      ];
+      final responseStream = _enhancedAiAgentService.chatWithTools(messages);
+      final buffer = StringBuffer();
+      await for (final chunk in responseStream) {
+        buffer.write(chunk);
+      }
+      return buffer.toString();
     } catch (e) {
       if (e is Failure) {
         rethrow;
@@ -104,6 +129,6 @@ class TripRepositoryImpl implements TripRepository {
 // Provider for TripRepositoryImpl
 final tripRepositoryProvider = Provider<TripRepository>((ref) {
   final localDatabase = ref.read(localDatabaseProvider);
-  final aiAgentService = ref.read(aiAgentServiceProvider);
-  return TripRepositoryImpl(localDatabase, aiAgentService);
+  final enhancedAiAgentService = ref.read(enhancedAIAgentServiceProvider);
+  return TripRepositoryImpl(localDatabase, enhancedAiAgentService);
 });

@@ -1,10 +1,10 @@
 # Smart Trip Planner 🌍
 
-An AI-powered Flutter application that helps users plan their perfect trips using OpenAI's GPT-4 and real-time web search capabilities.
+An AI-powered Flutter application that helps users plan their perfect trips using Google's Gemini AI and real-time web search capabilities.
 
 ## Features ✨
 
-- 🤖 **AI-Powered Trip Planning**: Natural language trip planning with OpenAI GPT-4
+- 🤖 **AI-Powered Trip Planning**: Natural language trip planning with Google Gemini AI
 - 🔍 **Real-time Web Search**: Get up-to-date information about destinations
 - 💬 **Interactive Chat Interface**: Streaming responses for real-time conversation
 - 💾 **Offline Storage**: Save and manage trips locally with Isar database
@@ -17,7 +17,7 @@ An AI-powered Flutter application that helps users plan their perfect trips usin
 
 - Flutter SDK (>=3.0.0)
 - Dart SDK (>=3.0.0)
-- OpenAI API Key
+- Google Gemini API Key
 
 ### Setup
 
@@ -36,10 +36,12 @@ An AI-powered Flutter application that helps users plan their perfect trips usin
    ```bash
    cp .env.example .env
    ```
-   Edit `.env` and add your OpenAI API key:
+   Edit `.env` and add your Gemini API key:
    ```
-   OPENAI_API_KEY=your-actual-openai-api-key-here
+   GEMINI_API_KEY=your-actual-gemini-api-key-here
    ```
+   
+   Alternatively, you can add your Gemini API key to the `GEMINI_API_KEY` file in the project root.
 
 4. **Run the app**
    ```bash

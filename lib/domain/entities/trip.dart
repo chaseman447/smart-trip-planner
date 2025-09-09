@@ -38,6 +38,10 @@ class ItineraryItem with _$ItineraryItem {
     required String location,
     String? description,
     String? mapUrl,
+    String? cost,
+    String? notes,
+    double? latitude,
+    double? longitude,
     @Default(false) bool isCompleted,
   }) = _ItineraryItem;
 

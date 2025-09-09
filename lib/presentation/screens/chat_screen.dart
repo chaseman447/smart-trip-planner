@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/trip.dart';
 import '../providers/trip_provider.dart';
-import '../widgets/chat_message_widget.dart';
-import '../widgets/chat_input.dart';
-import '../widgets/typing_indicator.dart';
+import '../widgets/multimodal_chat_widget.dart';
 import '../../core/constants/app_constants.dart';
 import '../../data/datasources/ai_agent_service.dart';
 
@@ -22,8 +20,8 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _textController = TextEditingController();
-  bool _isGenerating = false;
   Trip? _currentTrip;
+  VoidCallback? _clearChatCallback;
 
   @override
   void initState() {
@@ -73,137 +71,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _buildChatList(chatMessages, streamState),
-          ),
-          if (_isGenerating) const TypingIndicator(),
-          ChatInput(
-            controller: _textController,
-            onSend: _handleSendMessage,
-            isEnabled: !_isGenerating,
-          ),
-        ],
+      body: MultimodalChatWidget(
+        currentTrip: _currentTrip,
+        onTripGenerated: _handleTripGenerated,
+        onClearChat: () {
+          setState(() {
+            _currentTrip = null;
+          });
+        },
+        onRegisterClearCallback: (callback) {
+          _clearChatCallback = callback;
+        },
       ),
     );
   }
 
-  Widget _buildChatList(List<ChatMessage> messages, AsyncValue<String> streamState) {
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
-      itemCount: messages.length + (streamState.isLoading ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index < messages.length) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppConstants.defaultPadding),
-            child: ChatMessageWidget(
-              message: messages[index],
-              onTripGenerated: _handleTripGenerated,
-            ),
-          );
-        } else {
-          // Show streaming message
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppConstants.defaultPadding),
-            child: ChatMessageWidget(
-              message: ChatMessage(
-                id: 'streaming',
-                content: streamState.value ?? '',
-                type: ChatMessageType.assistant,
-                timestamp: DateTime.now(),
-                isStreaming: true,
-              ),
-              onTripGenerated: _handleTripGenerated,
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  Future<void> _handleSendMessage(String message) async {
-    if (message.trim().isEmpty) return;
-
-    // Add user message
-    final userMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      content: message.trim(),
-      type: ChatMessageType.user,
-      timestamp: DateTime.now(),
-    );
-
-    ref.read(chatNotifierProvider.notifier).addMessage(userMessage);
-    _textController.clear();
-    _scrollToBottom();
-
-    setState(() {
-      _isGenerating = true;
-    });
-
-    try {
-      // Use enhanced chat with function calling
-      final aiService = ref.read(aiAgentServiceProvider);
-      final chatMessages = ref.read(chatNotifierProvider);
-      String fullResponse = '';
-      
-      // Create streaming assistant message
-      final assistantMessage = ChatMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        content: '',
-        type: ChatMessageType.assistant,
-        timestamp: DateTime.now(),
-        isStreaming: true,
-      );
-      
-      ref.read(chatNotifierProvider.notifier).addMessage(assistantMessage);
-      
-      await for (final chunk in aiService.chatWithFunctions(chatMessages)) {
-        fullResponse += chunk;
-        
-        // Update the streaming message
-        final updatedMessage = ChatMessage(
-          id: assistantMessage.id,
-          content: fullResponse,
-          type: ChatMessageType.assistant,
-          timestamp: assistantMessage.timestamp,
-          isStreaming: true,
-        );
-        
-        ref.read(chatNotifierProvider.notifier).updateLastMessage(updatedMessage);
-        _scrollToBottom();
-      }
-      
-      // Mark message as complete
-      final finalMessage = ChatMessage(
-        id: assistantMessage.id,
-        content: fullResponse,
-        type: ChatMessageType.assistant,
-        timestamp: assistantMessage.timestamp,
-        isStreaming: false,
-      );
-      
-      ref.read(chatNotifierProvider.notifier).updateLastMessage(finalMessage);
-
-    } catch (error) {
-      // Add error message
-      final errorMessage = ChatMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        content: 'Sorry, I encountered an error: ${error.toString()}',
-        type: ChatMessageType.assistant,
-        timestamp: DateTime.now(),
-      );
-
-      ref.read(chatNotifierProvider.notifier).addMessage(errorMessage);
-    } finally {
-      setState(() {
-        _isGenerating = false;
-      });
-      ref.read(itineraryStreamNotifierProvider.notifier).reset();
-      _scrollToBottom();
-    }
-  }
+  // Removed _buildChatList and _handleSendMessage - now using MultimodalChatWidget
 
   void _handleTripGenerated(Trip trip) {
     setState(() {
@@ -250,6 +133,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     setState(() {
       _currentTrip = null;
     });
+    // Clear the chat widget's state as well
+    if (_clearChatCallback != null) {
+      _clearChatCallback!();
+    }
   }
 
   void _scrollToBottom() {
