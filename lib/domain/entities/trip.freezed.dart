@@ -22,6 +22,7 @@ Trip _$TripFromJson(Map<String, dynamic> json) {
 mixin _$Trip {
   String get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
   DateTime get startDate => throw _privateConstructorUsedError;
   DateTime get endDate => throw _privateConstructorUsedError;
   List<DayItinerary> get days => throw _privateConstructorUsedError;
@@ -46,6 +47,7 @@ abstract class $TripCopyWith<$Res> {
   $Res call(
       {String id,
       String title,
+      String? description,
       DateTime startDate,
       DateTime endDate,
       List<DayItinerary> days,
@@ -71,6 +73,7 @@ class _$TripCopyWithImpl<$Res, $Val extends Trip>
   $Res call({
     Object? id = null,
     Object? title = null,
+    Object? description = freezed,
     Object? startDate = null,
     Object? endDate = null,
     Object? days = null,
@@ -87,6 +90,10 @@ class _$TripCopyWithImpl<$Res, $Val extends Trip>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       startDate: null == startDate
           ? _value.startDate
           : startDate // ignore: cast_nullable_to_non_nullable
@@ -125,6 +132,7 @@ abstract class _$$TripImplCopyWith<$Res> implements $TripCopyWith<$Res> {
   $Res call(
       {String id,
       String title,
+      String? description,
       DateTime startDate,
       DateTime endDate,
       List<DayItinerary> days,
@@ -147,6 +155,7 @@ class __$$TripImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? title = null,
+    Object? description = freezed,
     Object? startDate = null,
     Object? endDate = null,
     Object? days = null,
@@ -163,6 +172,10 @@ class __$$TripImplCopyWithImpl<$Res>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       startDate: null == startDate
           ? _value.startDate
           : startDate // ignore: cast_nullable_to_non_nullable
@@ -197,6 +210,7 @@ class _$TripImpl implements _Trip {
   const _$TripImpl(
       {required this.id,
       required this.title,
+      this.description,
       required this.startDate,
       required this.endDate,
       required final List<DayItinerary> days,
@@ -212,6 +226,8 @@ class _$TripImpl implements _Trip {
   final String id;
   @override
   final String title;
+  @override
+  final String? description;
   @override
   final DateTime startDate;
   @override
@@ -234,7 +250,7 @@ class _$TripImpl implements _Trip {
 
   @override
   String toString() {
-    return 'Trip(id: $id, title: $title, startDate: $startDate, endDate: $endDate, days: $days, createdAt: $createdAt, updatedAt: $updatedAt, totalTokensUsed: $totalTokensUsed)';
+    return 'Trip(id: $id, title: $title, description: $description, startDate: $startDate, endDate: $endDate, days: $days, createdAt: $createdAt, updatedAt: $updatedAt, totalTokensUsed: $totalTokensUsed)';
   }
 
   @override
@@ -244,6 +260,8 @@ class _$TripImpl implements _Trip {
             other is _$TripImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
             (identical(other.startDate, startDate) ||
                 other.startDate == startDate) &&
             (identical(other.endDate, endDate) || other.endDate == endDate) &&
@@ -262,6 +280,7 @@ class _$TripImpl implements _Trip {
       runtimeType,
       id,
       title,
+      description,
       startDate,
       endDate,
       const DeepCollectionEquality().hash(_days),
@@ -289,6 +308,7 @@ abstract class _Trip implements Trip {
   const factory _Trip(
       {required final String id,
       required final String title,
+      final String? description,
       required final DateTime startDate,
       required final DateTime endDate,
       required final List<DayItinerary> days,
@@ -302,6 +322,8 @@ abstract class _Trip implements Trip {
   String get id;
   @override
   String get title;
+  @override
+  String? get description;
   @override
   DateTime get startDate;
   @override

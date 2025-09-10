@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/services/location_service.dart';
 
 class LocationPermissionWidget extends ConsumerStatefulWidget {
@@ -208,15 +209,41 @@ class _LocationPermissionWidgetState extends ConsumerState<LocationPermissionWid
     }
   }
 
-  void _openInMaps() {
+  void _openInMaps() async {
     if (_currentPosition != null) {
+      final lat = _currentPosition!.latitude.toString();
+      final lng = _currentPosition!.longitude.toString();
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Opening location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
+            'Opening location: $lat, $lng',
           ),
         ),
       );
+      
+      // Force Google Maps usage with web fallback
+      final urls = [
+        'comgooglemaps://?q=$lat,$lng', // Google Maps app (iOS/Android)
+        'https://maps.google.com/?q=$lat,$lng', // Google Maps web (always works)
+      ];
+      
+      // Try Google Maps app first, then always fallback to web
+      for (final urlString in urls) {
+        final uri = Uri.parse(urlString);
+        
+        // For web URL, always launch it as the final fallback
+        if (urlString.startsWith('https://maps.google.com')) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          return;
+        }
+        
+        // Try app URL first
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          return;
+        }
+      }
     }
   }
 }

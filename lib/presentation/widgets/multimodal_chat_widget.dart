@@ -1164,7 +1164,19 @@ class _MultimodalChatWidgetState extends ConsumerState<MultimodalChatWidget>
             }
           }
         }
-        final newTrip = _jsonToTrip(json);
+        // Extract clean response text (without JSON) to use as description
+        String cleanResponseText = response;
+        final jsonStartIndex = response.indexOf('{');
+        final jsonEndIndex = response.lastIndexOf('}');
+        
+        if (jsonStartIndex != -1 && jsonEndIndex != -1 && jsonEndIndex > jsonStartIndex) {
+          // Remove JSON from response, keeping text before and after
+          final beforeJson = response.substring(0, jsonStartIndex).trim();
+          final afterJson = response.substring(jsonEndIndex + 1).trim();
+          cleanResponseText = [beforeJson, afterJson].where((s) => s.isNotEmpty).join('\n\n');
+        }
+        
+        final newTrip = _jsonToTrip(json, cleanResponseText);
         
         // Store the extracted trip for save button functionality
         _currentExtractedTrip = newTrip;
@@ -1362,7 +1374,7 @@ class _MultimodalChatWidgetState extends ConsumerState<MultimodalChatWidget>
     }
   }
 
-  Trip _jsonToTrip(Map<String, dynamic> json) {
+  Trip _jsonToTrip(Map<String, dynamic> json, [String? description]) {
     try {
       // Validate required fields exist and are not null
       if (json['title'] == null || json['days'] == null) {
@@ -1421,21 +1433,36 @@ class _MultimodalChatWidgetState extends ConsumerState<MultimodalChatWidget>
               if (location.isEmpty) {
                 final title = activityJson['title'] as String? ?? '';
                 final description = activityJson['description'] as String? ?? '';
+                final venue = activityJson['venue'] as String? ?? '';
+                final place = activityJson['place'] as String? ?? '';
                 
-                // Try to extract location from title (look for patterns like "at Location" or "Location:")
-                 final titleLocationMatch = RegExp(r'(?:at|in|visit|explore)\s+([^,\n]+)', caseSensitive: false).firstMatch(title);
-                 if (titleLocationMatch != null && titleLocationMatch.groupCount > 0) {
-                   location = titleLocationMatch.group(1)?.trim() ?? '';
-                 } else {
-                   // Try to extract from description
-                   final descLocationMatch = RegExp(r'(?:at|in|visit|explore)\s+([^,\n\.]+)', caseSensitive: false).firstMatch(description);
-                   if (descLocationMatch != null && descLocationMatch.groupCount > 0) {
-                     location = descLocationMatch.group(1)?.trim() ?? '';
-                   } else if (title.isNotEmpty) {
-                     // Use the title as location if no specific location pattern found
-                     location = title;
-                   }
-                 }
+                // First try venue or place fields
+                if (venue.isNotEmpty) {
+                  location = venue;
+                } else if (place.isNotEmpty) {
+                  location = place;
+                } else {
+                  // Try to extract location from title (look for patterns like "at Location", "in Location", etc.)
+                  final titleLocationMatch = RegExp(r'(?:at|in|visit|explore|near|to)\s+([^,\n\(\)]+)', caseSensitive: false).firstMatch(title);
+                  if (titleLocationMatch != null && titleLocationMatch.groupCount > 0) {
+                    location = titleLocationMatch.group(1)?.trim() ?? '';
+                  } else {
+                    // Try to extract from description
+                    final descLocationMatch = RegExp(r'(?:at|in|visit|explore|near|to|located)\s+([^,\n\.\(\)]+)', caseSensitive: false).firstMatch(description);
+                    if (descLocationMatch != null && descLocationMatch.groupCount > 0) {
+                      location = descLocationMatch.group(1)?.trim() ?? '';
+                    } else {
+                      // Look for location patterns like "Location Name (City)" or "Location - City"
+                      final locationPattern = RegExp(r'([A-Z][a-zA-Z\s]+(?:Museum|Park|Tower|Bridge|Cathedral|Church|Palace|Market|Square|Street|Avenue|Center|Centre|Gallery|Theater|Theatre|Restaurant|Cafe|Hotel))', caseSensitive: false).firstMatch(title + ' ' + description);
+                      if (locationPattern != null && locationPattern.groupCount > 0) {
+                        location = locationPattern.group(1)?.trim() ?? '';
+                      } else if (title.isNotEmpty && !title.toLowerCase().contains('breakfast') && !title.toLowerCase().contains('lunch') && !title.toLowerCase().contains('dinner')) {
+                        // Use the title as location if no specific location pattern found and it's not a meal
+                        location = title;
+                      }
+                    }
+                  }
+                }
               }
               
               // If location is still empty but we have coordinates, use them
@@ -1512,6 +1539,7 @@ class _MultimodalChatWidgetState extends ConsumerState<MultimodalChatWidget>
       return Trip(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: json['title'] as String? ?? 'Untitled Trip',
+        description: description?.isNotEmpty == true ? description : null,
         startDate: startDate,
         endDate: endDate,
         days: days,

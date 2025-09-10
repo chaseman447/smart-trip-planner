@@ -9,6 +9,7 @@ part of 'trip.dart';
 _$TripImpl _$$TripImplFromJson(Map<String, dynamic> json) => _$TripImpl(
       id: json['id'] as String,
       title: json['title'] as String,
+      description: json['description'] as String?,
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
       days: (json['days'] as List<dynamic>)
@@ -25,6 +26,7 @@ Map<String, dynamic> _$$TripImplToJson(_$TripImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
+      'description': instance.description,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),
       'days': instance.days,

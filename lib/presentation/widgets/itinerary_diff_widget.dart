@@ -336,6 +336,98 @@ class ItineraryDiffWidget extends StatelessWidget {
                   ],
                 ),
                 
+                // Description
+                if (item.description != null && item.description!.isNotEmpty) ...[  
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.description,
+                        size: 16,
+                        color: hasChanges 
+                            ? _getShadeColor(_getChangeColor(changeType), 600)
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          item.description!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: hasChanges 
+                                ? _getShadeColor(_getChangeColor(changeType), 600)
+                                : theme.colorScheme.onSurfaceVariant,
+                            decoration: changeType == ChangeType.removed 
+                                ? TextDecoration.lineThrough 
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                
+                // Cost
+                if (item.cost != null && item.cost!.isNotEmpty) ...[  
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.attach_money,
+                        size: 16,
+                        color: hasChanges 
+                            ? _getShadeColor(_getChangeColor(changeType), 600)
+                            : Colors.green.shade600,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        item.cost!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: hasChanges 
+                              ? _getShadeColor(_getChangeColor(changeType), 600)
+                              : Colors.green.shade600,
+                          fontWeight: FontWeight.w500,
+                          decoration: changeType == ChangeType.removed 
+                              ? TextDecoration.lineThrough 
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                
+                // Notes
+                if (item.notes != null && item.notes!.isNotEmpty) ...[  
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.note,
+                        size: 16,
+                        color: hasChanges 
+                            ? _getShadeColor(_getChangeColor(changeType), 600)
+                            : Colors.orange.shade600,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          item.notes!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                             color: hasChanges 
+                                 ? _getShadeColor(_getChangeColor(changeType), 600)
+                                 : Colors.orange.shade600,
+                             fontStyle: FontStyle.italic,
+                             decoration: changeType == ChangeType.removed 
+                                 ? TextDecoration.lineThrough 
+                                 : null,
+                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                
                 // Show old vs new for modified items
                 if (changeType == ChangeType.modified && oldItem != null) ...[
                   const SizedBox(height: 8),

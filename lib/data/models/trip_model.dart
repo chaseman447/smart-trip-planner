@@ -13,6 +13,9 @@ class TripModel extends HiveObject {
   @HiveField(1)
   late String title;
   
+  @HiveField(8)
+  String? description;
+  
   @HiveField(2)
   late DateTime startDate;
   
@@ -30,12 +33,16 @@ class TripModel extends HiveObject {
   
   @HiveField(7)
   int totalTokensUsed = 0;
+  
+
 
   // Convert from domain entity
   static TripModel fromEntity(Trip trip) {
     return TripModel()
       ..tripId = trip.id
       ..title = trip.title
+      ..description = trip.description
+
       ..startDate = trip.startDate
       ..endDate = trip.endDate
       ..daysJson = _serializeDays(trip.days)
@@ -49,6 +56,7 @@ class TripModel extends HiveObject {
     return Trip(
       id: tripId,
       title: title,
+      description: description,
       startDate: startDate,
       endDate: endDate,
       days: _deserializeDays(daysJson),

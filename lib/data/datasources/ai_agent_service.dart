@@ -33,11 +33,12 @@ class AIAgentService {
       final prompt = await _buildSimplePrompt(userPrompt, existingTrip);
       print('🔍 OpenRouter Prompt: $prompt');
       
-      final response = await _openRouterService.generateContent(
+      final responseData = await _openRouterService.generateContent(
         text: prompt,
         maxTokens: 8000,
         temperature: 0.7,
       );
+      final response = responseData['content'] as String;
       print('✅ OpenRouter API call successful');
       return _parseSimpleItineraryResponse(response);
     } catch (e) {

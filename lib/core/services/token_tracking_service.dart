@@ -129,6 +129,8 @@ class TokenTrackingService extends StateNotifier<TokenMetrics> {
       model: model ?? 'gpt-4',
     );
 
+    print('📊 Token Usage Tracked: prompt=$promptTokens, completion=$completionTokens, total=$totalTokens, type=$requestType, model=${model ?? "gpt-4"}');
+
     final usage = TokenUsage(
       promptTokens: promptTokens,
       completionTokens: completionTokens,
@@ -139,6 +141,7 @@ class TokenTrackingService extends StateNotifier<TokenMetrics> {
     );
 
     state = state.addUsage(usage);
+    print('📈 Total tokens now: ${state.totalTokensUsed}, Total requests: ${state.requestCount}');
   }
 
   void trackEstimatedUsage({

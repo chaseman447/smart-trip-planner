@@ -6,6 +6,8 @@ import '../../core/services/token_tracking_service.dart';
 import '../../domain/entities/trip.dart';
 import '../../core/constants/app_constants.dart';
 import '../providers/trip_provider.dart';
+import '../../data/datasources/weather_service.dart';
+import 'trip_edit_screen.dart';
 
 import '../widgets/empty_state.dart';
 
@@ -90,7 +92,7 @@ class TripDetailScreen extends ConsumerWidget {
             onSelected: (value) {
               switch (value) {
                 case 'edit':
-                  _editTrip(context);
+                  _editTrip(context, trip!);
                   break;
                 case 'delete':
                   _deleteTrip(context);
@@ -149,94 +151,84 @@ class TripDetailScreen extends ConsumerWidget {
 
   Widget _buildTripHeader(ThemeData theme) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppConstants.defaultPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: theme.colorScheme.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${_formatDate(trip!.startDate)} - ${_formatDate(trip!.endDate)}',
-                    style: theme.textTheme.titleMedium,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  Icons.access_time,
-                  color: theme.colorScheme.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '${trip!.days} days',
-                  style: theme.textTheme.bodyLarge,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Consumer(
-              builder: (context, ref, child) {
-                final tokenSummary = ref.watch(tokenMetricsSummaryProvider);
-                final estimatedCost = (trip!.totalTokensUsed * 0.00002).toStringAsFixed(4);
-                
-                return Column(
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.token,
-                          color: theme.colorScheme.primary,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Tokens used: ${trip!.totalTokensUsed} (~\$${estimatedCost})',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    Icon(
+                      Icons.calendar_today,
+                      color: theme.colorScheme.primary,
+                      size: 20,
                     ),
-                    if (tokenSummary['totalTokens'] > 0) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const SizedBox(width: 28),
-                          Expanded(
-                            child: Text(
-                              'Session total: ${tokenSummary['totalTokens']} tokens (~\$${tokenSummary['totalCost'].toStringAsFixed(4)})',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
-                                fontSize: 11,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${_formatDate(trip!.startDate)} - ${_formatDate(trip!.endDate)}',
+                        style: theme.textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final tokenSummary = ref.watch(tokenMetricsSummaryProvider);
+                    final estimatedCost = (trip!.totalTokensUsed * 0.00002).toStringAsFixed(4);
+                    
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.token,
+                              color: theme.colorScheme.primary,
+                              size: 20,
                             ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Tokens used: ${trip!.totalTokensUsed} (~\$${estimatedCost})',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (tokenSummary['totalTokens'] > 0) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const SizedBox(width: 28),
+                              Expanded(
+                                child: Text(
+                                  'Session total: ${tokenSummary['totalTokens']} tokens (~\$${tokenSummary['totalCost'].toStringAsFixed(4)})',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                                    fontSize: 11,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                    ],
-                  ],
-                );
-              },
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -346,50 +338,97 @@ class TripDetailScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 16,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: item.location == 'TBD'
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.errorContainer,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '📍 Location TBD',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onErrorContainer,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          )
-                        : _isValidCoordinates(item.location)
-                            ? InkWell(
-                                onTap: () => _openInMaps(context, item.location),
-                                borderRadius: BorderRadius.circular(4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: item.location == 'TBD'
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.errorContainer,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
                                 child: Text(
-                                  item.location,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.primary,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: theme.colorScheme.primary,
+                                  '📍 Location TBD',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onErrorContainer,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               )
-                            : Text(
-                                item.location,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
+                            : (item.latitude != null && item.longitude != null) || _isValidCoordinates(item.location)
+                                ? InkWell(
+                                    onTap: () {
+                                      if (item.latitude != null && item.longitude != null) {
+                                        _openInMaps(context, '${item.latitude},${item.longitude}');
+                                      } else {
+                                        _openInMaps(context, item.location);
+                                      }
+                                    },
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Text(
+                                      item.location,
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: theme.colorScheme.primary,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: theme.colorScheme.primary,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    item.location,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                      ),
+                    ],
                   ),
+                  if (item.location != 'TBD') ...[
+                    const SizedBox(height: 4),
+                    InkWell(
+                      onTap: () => _showWeatherInfo(context, item, theme),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.wb_sunny,
+                              size: 14,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Weather',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
               if (item.description != null) ...[
@@ -399,6 +438,49 @@ class TripDetailScreen extends ConsumerWidget {
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
+                ),
+              ],
+              if (item.cost != null) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.attach_money,
+                      size: 16,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      item.cost!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (item.notes != null) ...[
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.note,
+                      size: 16,
+                      color: theme.colorScheme.secondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        item.notes!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.secondary,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],
@@ -437,30 +519,32 @@ class TripDetailScreen extends ConsumerWidget {
     
     print('DEBUG: Parsed coordinates - lat: $lat, lng: $lng');
     
-    // Try different map URLs in order of preference
+    // Force Google Maps usage with web fallback
     final urls = [
-      'https://maps.apple.com/?q=$lat,$lng', // Apple Maps (iOS)
-      'https://www.google.com/maps/search/?api=1&query=$lat,$lng', // Google Maps (web)
-      'geo:$lat,$lng', // Generic geo URI
+      'comgooglemaps://?q=$lat,$lng', // Google Maps app (iOS/Android)
+      'https://maps.google.com/?q=$lat,$lng', // Google Maps web (always works)
     ];
     
-    bool launched = false;
+    // Try Google Maps app first, then always fallback to web
     for (final urlString in urls) {
       print('DEBUG: Trying URL: $urlString');
       final uri = Uri.parse(urlString);
-      if (await canLaunchUrl(uri)) {
-        print('DEBUG: Successfully launching: $urlString');
+      
+      // For web URL, always launch it as the final fallback
+      if (urlString.startsWith('https://maps.google.com')) {
+        print('DEBUG: Launching Google Maps web as fallback: $urlString');
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-        launched = true;
+        return;
+      }
+      
+      // Try app URL first
+      if (await canLaunchUrl(uri)) {
+        print('DEBUG: Successfully launching Google Maps app: $urlString');
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
         return;
       } else {
-        print('DEBUG: Cannot launch: $urlString');
+        print('DEBUG: Google Maps app not available, will use web fallback');
       }
-    }
-    
-    if (!launched) {
-      print('DEBUG: No map app could handle the coordinates');
-      _showLocationError(context, 'No map app available to open location');
     }
   }
   
@@ -486,11 +570,10 @@ class TripDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _editTrip(BuildContext context) {
-    // TODO: Navigate to edit trip screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Trip editing coming soon!'),
+  void _editTrip(BuildContext context, Trip currentTrip) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TripEditScreen(trip: currentTrip),
       ),
     );
   }
@@ -554,5 +637,162 @@ class TripDetailScreen extends ConsumerWidget {
         );
       }
     }
+  }
+
+  void _showWeatherInfo(BuildContext context, ItineraryItem item, ThemeData theme) async {
+    final weatherService = WeatherService();
+    
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 16),
+            Text('Loading weather...'),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // Try to get coordinates from item
+      Map<String, double>? coords;
+      
+      // First, check if we have latitude and longitude directly from the item
+      if (item.latitude != null && item.longitude != null) {
+        coords = {
+          'latitude': item.latitude!,
+          'longitude': item.longitude!,
+        };
+        print('DEBUG: Using coordinates from item: ${item.latitude}, ${item.longitude}');
+      } else if (_isValidCoordinates(item.location)) {
+        // If location string contains valid coordinates, use those
+        final parts = item.location.split(',');
+        coords = {
+          'latitude': double.parse(parts[0].trim()),
+          'longitude': double.parse(parts[1].trim()),
+        };
+        print('DEBUG: Using coordinates from location string: ${item.location}');
+      } else {
+        // Last resort: try to parse coordinates from location string
+        coords = weatherService.parseCoordinates(item.location);
+        print('DEBUG: Trying to parse coordinates from location: ${item.location}');
+      }
+
+      if (coords == null) {
+        Navigator.of(context).pop(); // Close loading dialog
+        _showWeatherError(context, 'Could not determine coordinates for ${item.location}. Latitude: ${item.latitude}, Longitude: ${item.longitude}');
+        return;
+      }
+
+      // Get weather for current date or trip date if it's in the future
+      final now = DateTime.now();
+      final tripDate = trip!.startDate;
+      final weatherDate = tripDate.isAfter(now) ? tripDate : now;
+      final dateStr = '${weatherDate.year.toString().padLeft(4, '0')}-${weatherDate.month.toString().padLeft(2, '0')}-${weatherDate.day.toString().padLeft(2, '0')}';
+      
+      final weather = await weatherService.getDayWeather(
+        latitude: coords['latitude']!,
+        longitude: coords['longitude']!,
+        date: dateStr,
+      );
+
+      Navigator.of(context).pop(); // Close loading dialog
+
+      if (weather != null) {
+        _showWeatherDialog(context, item, weather, theme);
+      } else {
+        _showWeatherError(context, 'Failed to fetch weather data');
+      }
+    } catch (e) {
+      Navigator.of(context).pop(); // Close loading dialog
+      _showWeatherError(context, 'Error: $e');
+    }
+  }
+
+  void _showWeatherDialog(BuildContext context, ItineraryItem item, DailyWeather weather, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Text(weather.weatherIcon),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Weather for ${item.location}',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Date: ${weather.date}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              weather.weatherSummary,
+              style: theme.textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.thermostat, size: 16, color: Colors.orange),
+                const SizedBox(width: 4),
+                Text('High: ${weather.maxTemp.toInt()}°C'),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.ac_unit, size: 16, color: Colors.blue),
+                const SizedBox(width: 4),
+                Text('Low: ${weather.minTemp.toInt()}°C'),
+              ],
+            ),
+            if (weather.precipitation > 0) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.water_drop, size: 16, color: Colors.blue[700]),
+                  const SizedBox(width: 4),
+                  Text('Rain: ${weather.precipitation.toInt()}mm'),
+                ],
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showWeatherError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.orange,
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {},
+        ),
+      ),
+    );
   }
 }

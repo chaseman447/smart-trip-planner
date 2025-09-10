@@ -245,10 +245,16 @@ class EnhancedAIAgentService {
         final response = responseBuffer.toString();
         final trip = _parseItineraryResponse(response);
         
-        // Cache the trip in vector store for future reference
-        await _cacheTrip(trip, userPrompt);
+        // Get current token usage from tracking service and update trip
+        final tokenMetrics = _tokenTrackingService.state;
+        final updatedTrip = trip.copyWith(
+          totalTokensUsed: tokenMetrics.totalTokensUsed,
+        );
         
-        return trip;
+        // Cache the trip in vector store for future reference
+        await _cacheTrip(updatedTrip, userPrompt);
+        
+        return updatedTrip;
       } catch (e) {
         _logger.e('AI generation failed: $e');
         
@@ -941,7 +947,7 @@ class EnhancedAIAgentService {
     // Add strict JSON format requirement with detailed examples
     buffer.writeln('\nRESPONSE FORMAT REQUIREMENT:');
     buffer.writeln('You MUST respond with ONLY a valid JSON object in this exact format. Include DETAILED information for each field and do not leave any empty fields:');
-    buffer.writeln('\nDo NOT include any explanatory text, markdown formatting, or code blocks. Return ONLY the JSON object no icons.');
+    buffer.writeln('\nDo NOT include any explanatory text, markdown formatting, or code blocks. Return ONLY the JSON object no icons and do not leave any empty fields.');
     buffer.writeln('{');
     buffer.writeln('  "title": "Descriptive trip title with destination",');
     buffer.writeln('  "startDate": "YYYY-MM-DD",');
@@ -971,7 +977,9 @@ class EnhancedAIAgentService {
     buffer.writeln('- description: Provide rich details about the experience');
     buffer.writeln('- cost: Include realistic price estimates');
     buffer.writeln('- notes: Add practical tips and useful information');
-    
+    buffer.writeln('- latitude/longitude: MUST provide accurate GPS coordinates for each location. Use decimal degrees format (e.g., 48.8584 for latitude, 2.2945 for longitude). Never use 0.0 or placeholder values.');
+    buffer.writeln('- time: Include the time in numbers but as a string like this "10:00 AM"');
+
     // Add example JSON format
     buffer.writeln('\nEXAMPLE JSON FORMAT:');
     buffer.writeln('{');
@@ -1021,6 +1029,7 @@ class EnhancedAIAgentService {
     
     buffer.writeln('\nIMPORTANT REQUIREMENTS:');
     buffer.writeln('- Return ONLY the JSON object with detailed information in this exact format');
+    buffer.writeln('- the returned json should have the same components as the example, do not ladd anything and do not leave anything null');
     buffer.writeln('- DO NOT include any debug items, test entries, or placeholder activities');
     buffer.writeln('- Every activity must be a real, actionable item with specific details');
     buffer.writeln('- Include duration and category fields for each activity item');
@@ -1051,15 +1060,19 @@ class EnhancedAIAgentService {
         apiKey: AppConstants.openRouterApiKey,
       );
       
-      final response = await openRouterService.generateContent(
+      final responseData = await openRouterService.generateContent(
         text: prompt,
         maxTokens: 8000,
         temperature: 0.7,
       );
       
-      // Track token usage for OpenRouter
-      _tokenTrackingService.trackEstimatedUsage(
-        estimatedTokens: (prompt.length / 4).round() + (response.length / 4).round(),
+      final response = responseData['content'] as String;
+      final usage = responseData['usage'] as Map<String, dynamic>;
+      
+      // Track actual token usage from OpenRouter
+      _tokenTrackingService.trackTokenUsage(
+        promptTokens: usage['prompt_tokens'] as int? ?? 0,
+        completionTokens: usage['completion_tokens'] as int? ?? 0,
         requestType: requestType,
         model: 'deepseek-r1',
       );
@@ -1077,9 +1090,17 @@ class EnhancedAIAgentService {
         final response = await GeminiService.generateContent(text: prompt)
             .timeout(const Duration(seconds: 20));
         
-        // Track token usage (estimated for Gemini)
+        // Track token usage (estimated for Gemini since it doesn't provide usage data)
+        final estimatedPromptTokens = (prompt.length / 4).round();
+        final estimatedCompletionTokens = (response.length / 4).round();
+        
+        print('💰 Gemini Token Usage (Estimated):');
+        print('  • Prompt Tokens: $estimatedPromptTokens');
+        print('  • Completion Tokens: $estimatedCompletionTokens');
+        print('  • Total Tokens: ${estimatedPromptTokens + estimatedCompletionTokens}');
+        
         _tokenTrackingService.trackEstimatedUsage(
-          estimatedTokens: (prompt.length / 4).round() + (response.length / 4).round(),
+          estimatedTokens: estimatedPromptTokens + estimatedCompletionTokens,
           requestType: requestType,
           model: 'gemini-2.0-flash',
         );
@@ -1160,9 +1181,13 @@ class EnhancedAIAgentService {
     final duration = _extractDurationValue(userPrompt) ?? 3;
     final startDate = DateTime.now().add(const Duration(days: 1));
     
+    // Get current token usage from tracking service
+    final tokenMetrics = _tokenTrackingService.state;
+    
     return Trip(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: 'Basic Trip to $destination',
+
       startDate: startDate,
       endDate: startDate.add(Duration(days: duration - 1)),
       days: List.generate(duration, (index) => DayItinerary(
@@ -1179,7 +1204,7 @@ class EnhancedAIAgentService {
       )),
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      totalTokensUsed: 0,
+      totalTokensUsed: tokenMetrics.totalTokensUsed,
     );
   }
 
@@ -1358,6 +1383,8 @@ class EnhancedAIAgentService {
       return Trip(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: json['title'] as String? ?? 'Untitled Trip',
+        description: json['description'] as String?,
+  
         startDate: DateTime.parse(json['startDate'] as String? ?? DateTime.now().toIso8601String()),
         endDate: DateTime.parse(json['endDate'] as String? ?? DateTime.now().toIso8601String()),
         days: days,
@@ -1383,6 +1410,7 @@ class EnhancedAIAgentService {
               'type': 'string',
               'description': 'Descriptive title of the trip',
             },
+
             'startDate': {
               'type': 'string',
               'description': 'Start date in YYYY-MM-DD format',

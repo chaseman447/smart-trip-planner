@@ -19,6 +19,7 @@ class TripModelAdapter extends TypeAdapter<TripModel> {
     return TripModel()
       ..tripId = fields[0] as String
       ..title = fields[1] as String
+      ..description = fields[8] as String?
       ..startDate = fields[2] as DateTime
       ..endDate = fields[3] as DateTime
       ..daysJson = fields[4] as String
@@ -30,11 +31,13 @@ class TripModelAdapter extends TypeAdapter<TripModel> {
   @override
   void write(BinaryWriter writer, TripModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.tripId)
       ..writeByte(1)
       ..write(obj.title)
+      ..writeByte(8)
+      ..write(obj.description)
       ..writeByte(2)
       ..write(obj.startDate)
       ..writeByte(3)

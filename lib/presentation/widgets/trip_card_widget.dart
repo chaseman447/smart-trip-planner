@@ -277,6 +277,20 @@ class _TripCardWidgetState extends State<TripCardWidget>
             ),
             textAlign: TextAlign.center,
           ),
+          if (widget.trip.description != null && widget.trip.description!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              widget.trip.description!,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+                fontStyle: FontStyle.italic,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
           const SizedBox(height: 8),
           Text(
             'Mid-range • ${widget.trip.days.length} days',
@@ -285,7 +299,7 @@ class _TripCardWidgetState extends State<TripCardWidget>
               color: Colors.grey[600],
             ),
             textAlign: TextAlign.center,
-          ),
+          )
         ],
       ),
     );
@@ -455,6 +469,63 @@ class _TripCardWidgetState extends State<TripCardWidget>
                     ],
                   ),
                 ),
+                if (item.description != null && item.description!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    item.description!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
+                if (item.cost != null && item.cost!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.attach_money,
+                        size: 12,
+                        color: Colors.green[600],
+                      ),
+                      const SizedBox(width: 2),
+                      Expanded(
+                        child: Text(
+                          item.cost!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.green[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (item.notes != null && item.notes!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.note,
+                        size: 12,
+                        color: Colors.orange[600],
+                      ),
+                      const SizedBox(width: 2),
+                      Expanded(
+                        child: Text(
+                          item.notes!,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.orange[600],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -542,10 +613,28 @@ class _TripCardWidgetState extends State<TripCardWidget>
 
   void _openMap(String location) async {
     final encodedLocation = Uri.encodeComponent(location);
-    final url = 'https://maps.google.com/maps?q=$encodedLocation';
     
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    // Force Google Maps usage with web fallback
+    final urls = [
+      'comgooglemaps://?q=$encodedLocation', // Google Maps app (iOS/Android)
+      'https://maps.google.com/?q=$encodedLocation', // Google Maps web (always works)
+    ];
+    
+    // Try Google Maps app first, then always fallback to web
+    for (final urlString in urls) {
+      final uri = Uri.parse(urlString);
+      
+      // For web URL, always launch it as the final fallback
+      if (urlString.startsWith('https://maps.google.com')) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+      
+      // Try app URL first
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
     }
   }
 

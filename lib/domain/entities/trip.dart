@@ -8,6 +8,7 @@ class Trip with _$Trip {
   const factory Trip({
     required String id,
     required String title,
+    String? description,
     required DateTime startDate,
     required DateTime endDate,
     required List<DayItinerary> days,
