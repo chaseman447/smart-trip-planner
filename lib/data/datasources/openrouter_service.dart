@@ -19,8 +19,8 @@ class OpenRouterService {
 
   Future<Map<String, dynamic>> generateContent({
     required String text,
-    String model = 'rekaai/reka-flash-3:free',
-    int maxTokens = 5000,
+    String model = 'mistralai/mistral-small-3.2-24b-instruct:free',
+    int maxTokens = 8000,
     double temperature = 0.7,
   }) async {
     print('🚀 OpenRouter API Request Starting...');
@@ -138,8 +138,8 @@ class OpenRouterService {
 
   Future<Map<String, dynamic>> generateChatResponse({
     required String text,
-    String model = 'rekaai/reka-flash-3:free',
-    int maxTokens = 5000,
+    String model = 'mistralai/mistral-small-3.2-24b-instruct:free',
+    int maxTokens = 8000,
     double temperature = 0.7,
   }) async {
     return generateContent(
